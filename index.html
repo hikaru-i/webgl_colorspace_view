@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+    </head>
+    <body>
+        <script src="three.js-r105/build/three.js"></script>
+        <script src="three.js-r105/examples/js/controls/OrbitControls.js"></script>
+
+		<script src="three.js-r105/examples/js/utils/GeometryUtils.js"></script>
+		<script src="three.js-r105/examples/js/lines/LineSegmentsGeometry.js"></script>
+		<script src="three.js-r105/examples/js/lines/LineGeometry.js"></script>
+		<script src="three.js-r105/examples/js/lines/LineMaterial.js"></script>
+    	<script src="three.js-r105/examples/js/lines/LineSegments2.js"></script>
+		<script src="three.js-r105/examples/js/lines/Line2.js"></script>
+
+        <script src="xyz_cms.js"></script>
+
+        <script>
+            main();
+
+            function main() {
+                var scale = 1;
+                var camera = new THREE.PerspectiveCamera(33, window.innerWidth / window.innerHeight, 1, 10000);
+                camera.position.z = 4;
+
+                var scene = new THREE.Scene();
+
+                var renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+
+                var controls = new THREE.OrbitControls(camera);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.2;
+
+                // Dimension X
+                {
+                    for (i = -1.0; i <= 1.0; i += 0.1) {
+                        var material = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 1 });
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(new THREE.Vector3(0, i, -1), new THREE.Vector3(0, i, +1));
+                        var line = new THREE.Line(geometry, material);
+                        line.scale.set(scale, scale, scale);
+                        scene.add(line);
+                    }
+                    for (i = -1.0; i <= 1.0; i += 0.1) {
+                        var material = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 1 });
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(new THREE.Vector3(0, -1, i), new THREE.Vector3(0, +1, i));
+                        var line = new THREE.Line(geometry, material);
+                        line.scale.set(scale, scale, scale);
+                        scene.add(line);
+                    }
+                }
+
+                // Dimension Y
+                {
+                    for (i = -1.0; i <= 1.0; i += 0.1) {
+                        var material = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 1 });
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(new THREE.Vector3(-1, 0, i), new THREE.Vector3(+1, 0, i));
+                        var line = new THREE.Line(geometry, material);
+                        line.scale.set(scale, scale, scale);
+                        scene.add(line);
+                    }
+                    for (i = -1.0; i <= 1.0; i += 0.1) {
+                        var material = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 1 });
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(new THREE.Vector3(i, 0, -1), new THREE.Vector3(i, 0, +1));
+                        var line = new THREE.Line(geometry, material);
+                        line.scale.set(scale, scale, scale);
+                        scene.add(line);
+                    }
+                }
+
+                // Dimension Z
+                {
+                    for (i = -1.0; i <= 1.0; i += 0.1) {
+                        var material = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 1 });
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(new THREE.Vector3(-1, i, 0), new THREE.Vector3(+1, i, 0));
+                        var line = new THREE.Line(geometry, material);
+                        line.scale.set(scale, scale, scale);
+                        scene.add(line);
+                    }
+                    for (i = -1.0; i <= 1.0; i += 0.1) {
+                        var material = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 1 });
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(new THREE.Vector3(i, -1, 0), new THREE.Vector3(i, +1, 0));
+                        var line = new THREE.Line(geometry, material);
+                        line.scale.set(scale, scale, scale);
+                        scene.add(line);
+                    }
+                }
+
+                {
+                    var positions = [];
+				    var colors = [];
+                    for (i = 0; i < XYZ_CMF.length; i++) {
+                        positions.push(XYZ_CMF[i].x, XYZ_CMF[i].y, XYZ_CMF[i].z);
+                        var r =　3.2410 * XYZ_CMF[i].x - 1.5374 * XYZ_CMF[i].y - 0.4986 * XYZ_CMF[i].z;
+                        var g = -0.9692 * XYZ_CMF[i].x + 1.8760 * XYZ_CMF[i].y + 0.0416 * XYZ_CMF[i].z;
+                        var b =　0.0556 * XYZ_CMF[i].x - 0.2040 * XYZ_CMF[i].y + 1.0507 * XYZ_CMF[i].z;
+                        colors.push(r, g, b);
+                    }
+    				var geometry = new THREE.LineGeometry();
+				    geometry.setPositions(positions);
+				    geometry.setColors(colors);
+				    var material = new THREE.LineMaterial({
+					    color: 0xffffff,
+					    linewidth: 3,
+					    vertexColors: THREE.VertexColors,
+					    // resolution: [window.innerWidth, window.innerHeight], // How should I set this ???
+					    dashed: false
+				    });
+                    material.resolution.set(window.innerWidth, window.innerHeight);
+				    var line = new THREE.Line2(geometry, material);
+				    line.computeLineDistances();
+				    line.scale.set(scale, scale, scale);
+				    scene.add(line);
+                }
+
+
+
+
+                animate();
+
+                function animate() {
+                    controls.update();
+
+                    renderer.setClearColor(0x000000, 0);
+                    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+
+                    renderer.render(scene, camera);
+                    requestAnimationFrame(animate);
+                }
+            }
+        </script>
+    </body>
+</html>
