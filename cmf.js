@@ -1,4 +1,4 @@
-var XYZ_CMF = [
+var CMF_XYZ = [
     new THREE.Vector3(3.77E-03, 4.15E-04, 1.85E-02),
     new THREE.Vector3(4.53E-03, 5.03E-04, 2.22E-02),
     new THREE.Vector3(5.45E-03, 6.08E-04, 2.67E-02),
